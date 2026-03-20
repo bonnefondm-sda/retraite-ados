@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retour à l'Autel — Programme Ados</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400;1,600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1A1410;
+    --ink-mid: #3D2B1F;
+    --ink-soft: #6B4F3A;
+    --gold: #B8762A;
+    --gold-dim: #7A4E1C;
+    --gold-pale: #F7EFE3;
+    --gold-wash: #FBF6EF;
+    --slate: #2C3E50;
+    --slate-light: #D8E4EE;
+    --ember: #8B2A2A;
+    --ember-light: #F5DADA;
+    --sage: #2A5C3F;
+    --sage-light: #D4EBE0;
+    --violet: #3D2B6B;
+    --violet-light: #E4DDEF;
+    --bg: #F9F5EF;
+    --surface: #FFFFFF;
+    --border: rgba(26, 20, 16, 0.1);
+    --border-strong: rgba(26, 20, 16, 0.2);
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--ink);
+    padding: 3rem 2rem 2.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .header-eyebrow {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.25rem;
+  }
+  .header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.4rem, 7vw, 4rem);
+    font-weight: 700;
+    color: #F5EDD8;
+    line-height: 1.05;
+    margin-bottom: 0.4rem;
+    letter-spacing: -0.5px;
+  }
+  .header h1 em {
+    font-style: italic;
+    color: var(--gold);
+  }
+  .header-sub {
+    color: rgba(245, 237, 216, 0.5);
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+  .header-meta {
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+  }
+  .header-meta-item {
+    color: rgba(245, 237, 216, 0.6);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .header-meta-item::before {
+    content: '';
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--gold);
+    flex-shrink: 0;
+  }
+
+  /* NAV */
+  .nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav-tab {
+    flex: 1;
+    min-width: 110px;
+    padding: 0.9rem 0.5rem;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+    letter-spacing: 0.3px;
+  }
+  .nav-tab:hover { color: var(--ink); background: var(--gold-wash); }
+  .nav-tab.active { color: var(--gold); border-bottom-color: var(--gold); background: var(--gold-wash); }
+  .nav-tab .tab-label { font-size: 0.65rem; font-weight: 500; opacity: 0.55; display: block; margin-top: 2px; }
+
+  /* CONTENT */
+  .content { padding: 2rem 1.5rem; max-width: 860px; margin: 0 auto; }
+  .day-panel { display: none; }
+  .day-panel.active { display: block; }
+
+  /* DAY HEADER */
+  .day-header {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .day-number {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+  }
+  .day-header h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+  }
+  .day-header h2 em { font-style: italic; }
+  .day-header .day-meta {
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    font-weight: 500;
+  }
+  .day-header .day-ref {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 5px 12px;
+    background: var(--gold-pale);
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--gold-dim);
+    letter-spacing: 0.3px;
+  }
+
+  /* ACTIVITY CARDS */
+  .activities { display: flex; flex-direction: column; gap: 1rem; }
+
+  .activity {
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    background: var(--surface);
+    transition: border-color 0.2s;
+  }
+  .activity:hover { border-color: var(--border-strong); }
+  .activity.open { border-color: var(--gold); }
+
+  .activity-header {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .tag {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .tag-etude { background: var(--gold-pale); color: var(--gold-dim); }
+  .tag-discussion { background: var(--slate-light); color: var(--slate); }
+  .tag-defi { background: var(--violet-light); color: var(--violet); }
+  .tag-atelier { background: var(--sage-light); color: var(--sage); }
+  .tag-priere { background: var(--ember-light); color: var(--ember); }
+  .tag-louange { background: #EDE9FE; color: #4C1D95; }
+  .tag-jeu { background: #FEF3C7; color: #92400E; }
+  .tag-ceremonie { background: var(--ink); color: var(--gold); }
+
+  .activity-title {
+    flex: 1;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.3;
+  }
+  .activity-title .subtitle {
+    display: block;
+    font-size: 0.76rem;
+    font-weight: 400;
+    color: var(--ink-soft);
+    margin-top: 1px;
+  }
+  .activity-duration {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--gold);
+    white-space: nowrap;
+  }
+  .activity-arrow {
+    font-size: 0.6rem;
+    color: var(--ink-soft);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+    margin-left: 4px;
+  }
+  .activity.open .activity-arrow { transform: rotate(180deg); }
+
+  .activity-body {
+    display: none;
+    padding: 0 1.5rem 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+  .activity.open .activity-body { display: block; }
+
+  /* BODY ELEMENTS */
+  .obj {
+    margin-top: 1.25rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    background: var(--gold-wash);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--gold-dim);
+    border-left: 2px solid var(--gold);
+    letter-spacing: 0.2px;
+  }
+
+  .activity-body p {
+    font-size: 0.88rem;
+    line-height: 1.75;
+    color: var(--ink-mid);
+    margin-top: 0.875rem;
+  }
+
+  .activity-body h4 {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--ink-soft);
+    margin-top: 1.25rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .activity-body ul, .activity-body ol {
+    padding-left: 1.25rem;
+    font-size: 0.88rem;
+    line-height: 1.8;
+    color: var(--ink-mid);
+    margin-top: 0.5rem;
+  }
+
+  .step-list {
+    list-style: none;
+    padding: 0;
+    counter-reset: steps;
+    margin-top: 0.75rem;
+  }
+  .step-list li {
+    counter-increment: steps;
+    display: flex;
+    gap: 0.875rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.88rem;
+    line-height: 1.65;
+    align-items: flex-start;
+    color: var(--ink-mid);
+  }
+  .step-list li::before {
+    content: counter(steps);
+    background: var(--ink);
+    color: var(--gold);
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.68rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .verse-block {
+    margin-top: 1rem;
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    background: var(--ember-light);
+    border-left: 2px solid var(--ember);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    font-style: italic;
+    color: var(--ember);
+    line-height: 1.6;
+    font-weight: 600;
+  }
+
+  .materiel-block {
+    margin-top: 1rem;
+    padding: 0.875rem 1rem;
+    border-radius: 8px;
+    background: var(--slate-light);
+    border-left: 2px solid var(--slate);
+    font-size: 0.82rem;
+    color: var(--slate);
+    line-height: 1.65;
+  }
+  .materiel-block strong {
+    font-weight: 700;
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+
+  .tip-block {
+    margin-top: 1rem;
+    padding: 0.875rem 1rem;
+    border-radius: 8px;
+    background: var(--sage-light);
+    border-left: 2px solid var(--sage);
+    font-size: 0.82rem;
+    color: var(--sage);
+    line-height: 1.65;
+    font-weight: 500;
+  }
+
+  .warning-block {
+    margin-top: 1rem;
+    padding: 0.875rem 1rem;
+    border-radius: 8px;
+    background: var(--violet-light);
+    border-left: 2px solid var(--violet);
+    font-size: 0.82rem;
+    color: var(--violet);
+    line-height: 1.65;
+    font-weight: 500;
+  }
+
+  .question-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 0.75rem;
+  }
+  .question-list li {
+    padding: 0.6rem 0.875rem;
+    border-radius: 6px;
+    background: var(--gold-wash);
+    border: 1px solid rgba(184,118,42,0.15);
+    font-size: 0.88rem;
+    color: var(--ink-mid);
+    font-style: italic;
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+  }
+  .question-list li::before {
+    content: '→ ';
+    color: var(--gold);
+    font-style: normal;
+    font-weight: 700;
+  }
+
+  /* OVERVIEW */
+  .overview-intro {
+    background: var(--ink);
+    border-radius: var(--radius);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    color: rgba(245,237,216,0.75);
+    font-size: 0.9rem;
+    line-height: 1.75;
+  }
+  .overview-intro h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 0.875rem;
+  }
+
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .overview-card {
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .overview-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+  .oc-num {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+  .oc-j1 .oc-num { color: var(--gold); }
+  .oc-j2 .oc-num { color: var(--sage); }
+  .oc-j3 .oc-num { color: var(--slate); }
+  .overview-card h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+  }
+  .overview-card p { font-size: 0.82rem; color: var(--ink-soft); line-height: 1.55; }
+  .oc-count {
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+  }
+  .oc-j1 .oc-count { color: var(--gold); }
+  .oc-j2 .oc-count { color: var(--sage); }
+  .oc-j3 .oc-count { color: var(--slate); }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+    letter-spacing: 0.3px;
+  }
+  .legend-swatch {
+    width: 8px; height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 480px) {
+    .content { padding: 1.25rem 1rem; }
+    .day-header h2 { font-size: 1.6rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <p class="header-eyebrow">Retraite spirituelle des familles · Programme jeunes</p>
+  <h1>Retour à <em>l'Autel</em></h1>
+  <p class="header-sub">12 à 15 ans · 3 jours de retraite</p>
+  <div class="header-meta">
+    <span class="header-meta-item">3 thèmes progressifs</span>
+    <span class="header-meta-item">6 à 7 activités par jour</span>
+    <span class="header-meta-item">Études, débats, ateliers, prière</span>
+  </div>
+</header>
+
+<nav class="nav">
+  <button class="nav-tab active" data-panel="overview">
+    <span class="tab-label">Vue d'ensemble</span>3 jours
+  </button>
+  <button class="nav-tab" data-panel="jour1">
+    <span class="tab-label">Jour 1</span>L'autel abandonné
+  </button>
+  <button class="nav-tab" data-panel="jour2">
+    <span class="tab-label">Jour 2</span>Le chemin du disciple
+  </button>
+  <button class="nav-tab" data-panel="jour3">
+    <span class="tab-label">Jour 3</span>Être bénédiction
+  </button>
+</nav>
+
+<div class="content">
+
+  <!-- OVERVIEW -->
+  <div class="day-panel active" id="panel-overview">
+    <div class="overview-intro">
+      <h3>Pourquoi ce programme est différent pour les ados</h3>
+      <p>Les 12-15 ans traversent une période de construction identitaire intense. Ils questionnent, doutent, testent les limites. Un programme qui les traite comme des enfants échouera. Celui-ci parie sur leur intelligence et leur profondeur : des vraies questions sans réponses faciles, des discussions où le silence est permis, des actes concrets plutôt que des promesses abstraites. Le thème "Retour à l'autel" devient ici une question existentielle : <em>qu'est-ce qui m'empêche de revenir à Dieu ?</em></p>
+    </div>
+    <div class="overview-grid">
+      <div class="overview-card oc-j1" onclick="switchTo('jour1')">
+        <div class="oc-num">Jour 1</div>
+        <h3>L'autel abandonné</h3>
+        <p>Diagnostiquer honnêtement : où en suis-je avec Dieu ? Qu'est-ce qui a refroidi ? La distance n'est pas une fatalité.</p>
+        <div class="oc-count">6 activités · ~5h</div>
+      </div>
+      <div class="overview-card oc-j2" onclick="switchTo('jour2')">
+        <div class="oc-num">Jour 2</div>
+        <h3>Le chemin du disciple</h3>
+        <p>Être disciple à 13 ans, c'est quoi concrètement ? Explorer l'identité chrétienne dans un monde qui tire dans tous les sens.</p>
+        <div class="oc-count">7 activités · ~5h</div>
+      </div>
+      <div class="overview-card oc-j3" onclick="switchTo('jour3')">
+        <div class="oc-num">Jour 3</div>
+        <h3>Être bénédiction</h3>
+        <p>Transformer ce qui a été reçu en don. Les ados deviennent acteurs de la clôture de la retraite familiale.</p>
+        <div class="oc-count">6 activités · ~4h30</div>
+      </div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--gold)"></span>Étude biblique</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--slate)"></span>Discussion</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--violet)"></span>Défi</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--sage)"></span>Atelier créatif</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--ember)"></span>Prière</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#4C1D95"></span>Louange</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#92400E"></span>Jeu / défi phys.</div>
+    </div>
+  </div>
+
+  <!-- JOUR 1 -->
+  <div class="day-panel" id="panel-jour1">
+    <div class="day-header">
+      <div class="day-number" style="color:var(--gold)">Jour 1</div>
+      <h2>L'autel <em>abandonné</em></h2>
+      <div class="day-meta">Thème : honnêteté spirituelle · Où en suis-je vraiment avec Dieu ?</div>
+      <div class="day-ref">Référence : Genèse 35:1-7 · Jacob reçoit l'ordre de retourner à Béthel</div>
+    </div>
+    <div class="activities">
+
+      <div class="activity" id="a1">
+        <div class="activity-header" onclick="toggle('a1')">
+          <span class="tag tag-discussion">Discussion</span>
+          <span class="activity-title">
+            Ice-breaker radical — "La dernière fois que j'ai vraiment parlé à Dieu"
+            <span class="subtitle">Ouverture sans filet</span>
+          </span>
+          <span class="activity-duration">20 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : établir dès le départ un espace de parole vraie — pas les réponses attendues, mais ce qui est réel.</div>
+          <p>En cercle, sans introduction longue. L'animateur commence par témoigner brièvement et honnêtement de sa propre période de distance avec Dieu. Puis chacun répond — ou passe. Pas de jugement, pas de moralisation.</p>
+          <ul class="question-list">
+            <li>La dernière fois que j'ai vraiment eu l'impression de parler à Dieu, c'était...</li>
+            <li>Ce qui rend difficile de prier en ce moment, c'est...</li>
+            <li>Si je suis honnête, mon autel ressemble plutôt à...</li>
+          </ul>
+          <div class="warning-block">Règle absolue à poser dès le début : ce qui est dit ici reste ici. Aucune pression de partage. Les silences sont respectables.</div>
+        </div>
+      </div>
+
+      <div class="activity" id="a2">
+        <div class="activity-header" onclick="toggle('a2')">
+          <span class="tag tag-etude">Étude</span>
+          <span class="activity-title">
+            Jacob à Béthel : l'homme qui avait tout oublié
+            <span class="subtitle">Étude inductive de Genèse 35:1-7 · avec méthode SOAP</span>
+          </span>
+          <span class="activity-duration">35 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : comprendre que "retour à l'autel" est d'abord un acte de mémoire — se souvenir d'où Dieu nous a rencontrés.</div>
+          <p>Lisez ensemble Genèse 35:1-7. Utilisez la méthode SOAP pour structurer l'étude en petits groupes (3-4 ados) :</p>
+          <h4>Méthode SOAP</h4>
+          <ol class="step-list">
+            <li><strong>S — Scripture :</strong> Quel verset vous a le plus frappé ? Pourquoi ? Lisez-le à voix haute.</li>
+            <li><strong>O — Observation :</strong> Que remarquez-vous ? Jacob devait d'abord "se purifier" avant de monter à Béthel. Pourquoi ?</li>
+            <li><strong>A — Application :</strong> Qu'est-ce que Dieu voulait vraiment de Jacob — un lieu, un rituel, ou quelque chose d'autre ?</li>
+            <li><strong>P — Prayer :</strong> Chaque groupe formule une prière courte à voix haute ou dans leur carnet.</li>
+          </ol>
+          <p>Mise en commun en grand groupe. Point de tension à explorer : Jacob avait vécu à Béthel son expérience la plus forte avec Dieu — et il s'était éloigné quand même. Comment c'est possible ?</p>
+          <div class="verse-block">"Lève-toi, monte à Béthel, et demeure-y. Fais-y un autel au Dieu qui t'est apparu..." (Genèse 35:1)</div>
+        </div>
+      </div>
+
+      <div class="activity" id="a3">
+        <div class="activity-header" onclick="toggle('a3')">
+          <span class="tag tag-defi">Défi</span>
+          <span class="activity-title">
+            La carte de ma vie spirituelle — Cartographie personnelle
+            <span class="subtitle">Exercice introspectif individuel</span>
+          </span>
+          <span class="activity-duration">30 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : visualiser concrètement son parcours spirituel — les hauts, les bas, les tournants.</div>
+          <p>Chaque ado reçoit une grande feuille. Il dessine une ligne de temps de sa vie avec des "montagnes" (moments forts avec Dieu) et des "vallées" (moments de distance). Ce n'est pas une note, personne ne le lira sauf s'ils le souhaitent.</p>
+          <h4>Sur leur carte, ils marquent :</h4>
+          <ul>
+            <li>Le moment où Dieu leur a semblé le plus réel</li>
+            <li>Le moment où ils s'en sont le plus éloignés — et pourquoi</li>
+            <li>Là où ils se situent aujourd'hui</li>
+            <li>Où ils aimeraient être dans 6 mois</li>
+          </ul>
+          <p>Option : partager en binôme avec quelqu'un en qui ils ont confiance. Jamais forcé.</p>
+          <div class="materiel-block">
+            <strong>Matériel</strong>
+            Grandes feuilles A3 ou papier kraft, feutres de couleur, stylos, musique instrumentale en fond
+          </div>
+          <div class="tip-block">Ces cartes seront conservées par les ados et reprises au jour 3 pour la lettre à leurs parents.</div>
+        </div>
+      </div>
+
+      <div class="activity" id="a4">
+        <div class="activity-header" onclick="toggle('a4')">
+          <span class="tag tag-jeu">Jeu</span>
+          <span class="activity-title">
+            Le tribunal des objets — Qu'est-ce qui occupe mon autel ?
+            <span class="subtitle">Jeu théâtral et débat</span>
+          </span>
+          <span class="activity-duration">35 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : identifier avec humour et lucidité les "idoles modernes" qui remplacent Dieu dans leur quotidien.</div>
+          <p>Placez au centre de la salle des objets symboliques : un smartphone, une manette de jeu, un agenda surchargé, des réseaux sociaux (logo imprimé), une paire de baskets, une télé-commande. Chaque objet "passe en procès" — l'animateur joue le juge.</p>
+          <h4>Déroulement du procès</h4>
+          <ol class="step-list">
+            <li>Un ado joue l'avocat de l'objet (<em>"Mon téléphone m'aide à rester en contact avec mes amis chrétiens..."</em>)</li>
+            <li>Un autre joue le procureur (<em>"Mais tu passes 4h par jour dessus et 5 minutes avec Dieu..."</em>)</li>
+            <li>Le jury (le groupe) vote : coupable ou innocent ?</li>
+            <li>Discussion : la vraie question n'est pas "l'objet est-il mauvais ?" mais "occupe-t-il une place que seul Dieu devrait avoir ?"</li>
+          </ol>
+          <div class="tip-block">Gardez le ton léger et drôle — surtout sur le smartphone. L'auto-dérision libère la honnêteté.</div>
+        </div>
+      </div>
+
+      <div class="activity" id="a5">
+        <div class="activity-header" onclick="toggle('a5')">
+          <span class="tag tag-atelier">Atelier</span>
+          <span class="activity-title">
+            Mon journal de retraite — Création du carnet personnel
+            <span class="subtitle">Objet de référence pour les 3 jours</span>
+          </span>
+          <span class="activity-duration">25 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : créer un support de réflexion personnel que chaque ado gardera comme trace de la retraite.</div>
+          <p>Chaque ado reçoit un carnet (ou assemble des feuilles cousues ensemble). La couverture est personnalisée. À l'intérieur : des "pages guide" pour structurer les 3 jours — une page de prière par soir, une page pour les versets qui les touchent, une page de questions sans réponses.</p>
+          <p>L'animateur présente aussi le "défi du matin" : chaque jour, avant les activités, chacun prend 5 minutes seul avec son carnet et son verset du jour. Ce n'est pas contrôlé — c'est une invitation.</p>
+          <div class="materiel-block">
+            <strong>Matériel</strong>
+            Carnets kraft ou feuilles à assembler, stylos, masking tape déco, tampons ou stickers discrets, feutres fins
+          </div>
+        </div>
+      </div>
+
+      <div class="activity" id="a6">
+        <div class="activity-header" onclick="toggle('a6')">
+          <span class="tag tag-priere">Prière</span>
+          <span class="activity-title">
+            La prière de l'honnêteté — Clôture du jour 1
+            <span class="subtitle">Prière corporelle à voix haute ou écrite</span>
+          </span>
+          <span class="activity-duration">20 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : clore la journée par un acte de vérité devant Dieu — différent d'une prière "de politesse".</div>
+          <p>L'animateur introduit : <em>"Les psaumes de David ne sont pas polis. David dit à Dieu : je suis épuisé, j'ai peur, je suis en colère, je ne comprends pas. Dieu peut encaisser notre honnêteté."</em></p>
+          <p>Deux options au choix pour chaque ado :</p>
+          <ul>
+            <li><strong>Option A :</strong> Écrire dans le carnet une prière honnête — pas forcément belle, juste vraie.</li>
+            <li><strong>Option B :</strong> Dire à voix haute, en une phrase, quelque chose de vrai à Dieu. Peut se résumer à un seul mot.</li>
+          </ul>
+          <div class="verse-block">"Du fond des abîmes je T'invoque, ô Éternel." (Psaume 130:1)</div>
+          <div class="tip-block">Finissez avec un chant ou une musique instrumentale douce — ne remplissez pas le silence qui suit les partages.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- JOUR 2 -->
+  <div class="day-panel" id="panel-jour2">
+    <div class="day-header">
+      <div class="day-number" style="color:var(--sage)">Jour 2</div>
+      <h2>Le chemin du <em>disciple</em></h2>
+      <div class="day-meta">Thème : identité et engagement · Qu'est-ce que ça change concrètement ?</div>
+      <div class="day-ref">Références : Marc 8:34 · Luc 9:57-62 · Le coût du discipulat</div>
+    </div>
+    <div class="activities">
+
+      <div class="activity" id="b1">
+        <div class="activity-header" onclick="toggle('b1')">
+          <span class="tag tag-discussion">Discussion</span>
+          <span class="activity-title">
+            "Follower" ou disciple ? — Décoder un mot galvaudé
+            <span class="subtitle">Discussion ouverte avec tensions assumées</span>
+          </span>
+          <span class="activity-duration">25 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : distinguer l'appartenance culturelle à l'église de l'engagement personnel — sans culpabiliser.</div>
+          <p>Commencez par un fait : sur les réseaux, on peut "follow" quelqu'un sans vraiment le connaître. On peut être abonné, voir ses posts, apprécier ses idées — et ne jamais lui parler. Posez la question sans détour :</p>
+          <ul class="question-list">
+            <li>Suis-je chrétien parce que mes parents le sont, ou parce que j'ai décidé de l'être ?</li>
+            <li>Quelle différence entre "je crois en Dieu" et "je suis disciple de Jésus" ?</li>
+            <li>Si je retire l'église, les parents, l'habitude — il reste quoi de ma foi ?</li>
+          </ul>
+          <p>L'animateur n'a pas toutes les réponses. Il peut témoigner de sa propre transition entre foi héritée et foi choisie. La question n'est pas de culpabiliser ceux qui doutent — c'est de les inviter à prendre conscience.</p>
+          <div class="verse-block">"Si quelqu'un veut venir après moi, qu'il renonce à lui-même, qu'il prenne sa croix, et qu'il me suive." (Marc 8:34)</div>
+        </div>
+      </div>
+
+      <div class="activity" id="b2">
+        <div class="activity-header" onclick="toggle('b2')">
+          <span class="tag tag-etude">Étude</span>
+          <span class="activity-title">
+            Les excuses de Luc 9 — Quand on remet à plus tard
+            <span class="subtitle">Étude de cas · Luc 9:57-62</span>
+          </span>
+          <span class="activity-duration">30 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : reconnaître ses propres "bonnes raisons" de ne pas s'engager maintenant.</div>
+          <p>Trois personnages dans ce texte, trois excuses légitimes : enterrer son père, dire au revoir à sa famille. Jésus répond durement. Pourquoi ? Ce n'est pas parce que ces choses sont mauvaises — c'est parce que "plus tard" finit souvent par devenir "jamais".</p>
+          <h4>Travail en groupes</h4>
+          <p>Chaque groupe reçoit un personnage. Leur mission : défendre son excuse (<em>pourquoi c'est raisonnable</em>), puis identifier quelle "bonne raison" de leur vie ressemble à celle du personnage.</p>
+          <p>Mise en commun. Question finale collective :</p>
+          <ul class="question-list">
+            <li>Qu'est-ce que tu remettrais "à demain" dans ta relation avec Dieu en ce moment ?</li>
+          </ul>
+          <div class="verse-block">"Jésus lui dit : Laisse les morts ensevelir leurs morts ; pour toi, va annoncer le royaume de Dieu." (Luc 9:60)</div>
+        </div>
+      </div>
+
+      <div class="activity" id="b3">
+        <div class="activity-header" onclick="toggle('b3')">
+          <span class="tag tag-jeu">Jeu</span>
+          <span class="activity-title">
+            L'expédition en terrain inconnu — Jeu d'aventure en plein air
+            <span class="subtitle">Parcours avec décisions et conséquences</span>
+          </span>
+          <span class="activity-duration">45 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : expérimenter que le discipulat demande de la confiance même quand on ne voit pas la route entière.</div>
+          <p>Divisez en équipes de 4-5. Chaque équipe reçoit un carnet de "mission" avec des instructions partielles — chaque étape ne se révèle qu'une fois la précédente accomplie. Les équipes progressent dans l'espace disponible (parc, jardin, bâtiment).</p>
+          <h4>Structure des étapes</h4>
+          <ol class="step-list">
+            <li><strong>La boussole :</strong> trouver le nord sans regarder son téléphone. → Se repérer.</li>
+            <li><strong>Le fardeau :</strong> un des membres porte un objet lourd — les autres décident comment l'aider. → Portez-vous les uns les autres.</li>
+            <li><strong>Le silence :</strong> 3 minutes complètes sans parler, mais continuer la mission. → La présence de Dieu dans le silence.</li>
+            <li><strong>Le choix :</strong> deux chemins — le court et inconnu, le long et familier. Discutez et choisissez. → La confiance.</li>
+            <li><strong>Le service :</strong> arrivés au dernier point, trouver quelque chose de concret à faire pour améliorer l'espace. → L'amour en action.</li>
+          </ol>
+          <p>Retour en groupe : débriefing avec le verset de Proverbes 3:5-6.</p>
+          <div class="verse-block">"Confie-toi en l'Éternel de tout ton cœur... Il rendra tes sentiers droits." (Proverbes 3:5-6)</div>
+        </div>
+      </div>
+
+      <div class="activity" id="b4">
+        <div class="activity-header" onclick="toggle('b4')">
+          <span class="tag tag-atelier">Atelier</span>
+          <span class="activity-title">
+            Mon manifeste de foi — Écriture créative personnelle
+            <span class="subtitle">Texte libre, lettre, slam ou liste</span>
+          </span>
+          <span class="activity-duration">35 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : formaliser par écrit ce en quoi ils croient vraiment — pas ce qu'on attend d'eux, mais leur propre confession de foi.</div>
+          <p>Chaque ado écrit dans son carnet un "manifeste" personnel. Format libre :</p>
+          <ul>
+            <li><strong>Une lettre :</strong> à eux-mêmes dans 5 ans, sur leur foi aujourd'hui</li>
+            <li><strong>Un slam / texte rythmé :</strong> ce que Dieu représente pour eux</li>
+            <li><strong>Une liste :</strong> "Je crois que... Je ne crois plus que... Je veux croire que..."</li>
+            <li><strong>Un dessin annotué :</strong> représentation visuelle de leur relation avec Dieu</li>
+          </ul>
+          <p>Ce texte n'est pas lu, sauf si quelqu'un le souhaite. Il sera glissé dans l'enveloppe remise aux parents au jour 3 — ou gardé totalement privé au choix de chacun.</p>
+          <div class="materiel-block">
+            <strong>Matériel</strong>
+            Carnets, stylos, feutres fins, musique de fond instrumentale ou de worship calme
+          </div>
+          <div class="tip-block">Quelques ados peuvent vouloir partager leur texte à voix haute spontanément. Laissez ce moment exister s'il se crée.</div>
+        </div>
+      </div>
+
+      <div class="activity" id="b5">
+        <div class="activity-header" onclick="toggle('b5')">
+          <span class="tag tag-louange">Louange</span>
+          <span class="activity-title">
+            Le set de louange participatif — Les ados choisissent et mènent
+            <span class="subtitle">Prise en main par le groupe</span>
+          </span>
+          <span class="activity-duration">30 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : expérimenter la louange comme acte de disciple actif — pas spectateur, mais participant.</div>
+          <p>La veille, demandez à 2-3 ados volontaires de choisir 3-4 chants pour ce moment et de mener la louange. L'animateur est en soutien, pas devant. Si aucun n'est musicien, utilisez des enregistrements — mais les ados gèrent la playlist, l'ambiance, les temps de silence.</p>
+          <p>Entre les chants, encouragez un temps d'intercession spontanée : chacun peut prier à voix haute pour une personne de sa famille. Pas d'obligation, juste l'invitation.</p>
+          <div class="tip-block">Donnez cette responsabilité le soir du jour 1 — laisser les ados s'organiser entre eux renforce leur appropriation.</div>
+        </div>
+      </div>
+
+      <div class="activity" id="b6">
+        <div class="activity-header" onclick="toggle('b6')">
+          <span class="tag tag-defi">Défi</span>
+          <span class="activity-title">
+            Mission préparation — La surprise pour les parents
+            <span class="subtitle">Construction secrète du moment du jour 3</span>
+          </span>
+          <span class="activity-duration">25 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : commencer à préparer quelque chose de concret et de personnel pour la cérémonie finale.</div>
+          <p>Présentation du "défi du lendemain" : chaque ado prépare pour ses parents un geste de bénédiction. Trois formats possibles, au choix :</p>
+          <ul>
+            <li><strong>Une lettre écrite</strong> : ce qu'ils n'ont jamais dit, une promesse concrète</li>
+            <li><strong>Un engagement affiché</strong> : une chose qu'ils s'engagent à faire différemment dans la famille</li>
+            <li><strong>Un objet créé</strong> : dessin, texte encadré, objet symbolique fait de ses mains</li>
+          </ul>
+          <p>Ce soir, ils commencent. Demain matin, ils finissent. L'animateur est disponible pour les aider à formuler.</p>
+          <div class="materiel-block">
+            <strong>Matériel</strong>
+            Enveloppes kraft, papiers calligraphiés, feutres fins, petit matériel créatif selon les envies
+          </div>
+        </div>
+      </div>
+
+      <div class="activity" id="b7">
+        <div class="activity-header" onclick="toggle('b7')">
+          <span class="tag tag-priere">Prière</span>
+          <span class="activity-title">
+            Le mur des noms — Prière d'intercession pour la famille
+            <span class="subtitle">Clôture du jour 2</span>
+          </span>
+          <span class="activity-duration">20 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : prier avec intention pour les membres de sa famille — un acte de disciple, pas une formalité.</div>
+          <p>Chaque ado écrit sur des post-its les prénoms des membres de sa famille — un prénom par post-it. Il les colle sur le "mur des noms" installé dans la salle. L'animateur invite à prier en marchant devant le mur, en posant la main sur chaque prénom qu'on reconnaît.</p>
+          <p>Finissez avec un moment de silence complet, puis une bénédiction dite par l'animateur sur tous les noms.</p>
+          <div class="tip-block">Ce mur sera visible jusqu'à la cérémonie finale — rappel visuel de pourquoi on est là.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- JOUR 3 -->
+  <div class="day-panel" id="panel-jour3">
+    <div class="day-header">
+      <div class="day-number" style="color:var(--slate)">Jour 3</div>
+      <h2>Être <em>bénédiction</em></h2>
+      <div class="day-meta">Thème : agir et donner · De la réception au don</div>
+      <div class="day-ref">Références : Genèse 12:2 · 1 Pierre 4:10 · "Chacun selon le don qu'il a reçu"</div>
+    </div>
+    <div class="activities">
+
+      <div class="activity" id="c1">
+        <div class="activity-header" onclick="toggle('c1')">
+          <span class="tag tag-etude">Étude</span>
+          <span class="activity-title">
+            "Tu seras une bénédiction" — Pas une promesse pour les adultes
+            <span class="subtitle">Genèse 12:2 · 1 Pierre 4:10</span>
+          </span>
+          <span class="activity-duration">25 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : déconstruire l'idée que "bénir sa famille" c'est pour plus tard — et l'ancrer dans le maintenant.</div>
+          <p>Dieu dit à Abraham : "Tu seras une bénédiction." Pas "tu le seras peut-être", pas "quand tu auras grandi". Abraham était déjà vieux — mais le principe s'applique quel que soit l'âge.</p>
+          <p>1 Pierre 4:10 précise : "Chacun de vous, selon le don qu'il a reçu, mettez-le au service des autres." Pas "chacun d'entre vous quand il sera adulte".</p>
+          <h4>Discussion dirigée</h4>
+          <ul class="question-list">
+            <li>Comment est-ce qu'un ado de 13 ans peut être une bénédiction pour ses parents — concrètement ?</li>
+            <li>Quelle chose pourrais-tu faire cette semaine qui changerait quelque chose dans ta famille ?</li>
+            <li>C'est quoi la différence entre rendre service et être une bénédiction ?</li>
+          </ul>
+          <div class="verse-block">"Je te bénirai... et tu seras une bénédiction." (Genèse 12:2)</div>
+        </div>
+      </div>
+
+      <div class="activity" id="c2">
+        <div class="activity-header" onclick="toggle('c2')">
+          <span class="tag tag-defi">Défi</span>
+          <span class="activity-title">
+            Le défi des 21 jours — Conception collective d'une habitude de bénédiction
+            <span class="subtitle">Défi pratique et vérifiable</span>
+          </span>
+          <span class="activity-duration">30 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : transformer la retraite en point de départ réel — pas juste un beau souvenir.</div>
+          <p>En petits groupes, les ados conçoivent ensemble un "défi des 21 jours" pour être une bénédiction dans leur famille. Ce n'est pas un défi spirituel abstrait — c'est concret, mesurable et faisable.</p>
+          <h4>Exemples de défis proposés par des ados</h4>
+          <ul>
+            <li>Dire "merci" à au moins un parent chaque jour — verbalement, pas par texto</li>
+            <li>Prier pour mes parents chaque matin avant de regarder mon téléphone</li>
+            <li>Faire quelque chose à la maison sans être demandé, 3 fois par semaine</li>
+            <li>Ne pas répondre agressivement quand j'ai envie de le faire — et noter ce que j'ai fait à la place</li>
+            <li>Lire un verset avec un frère ou une sœur le soir, 2 fois par semaine</li>
+          </ul>
+          <p>Chaque ado choisit SON défi, l'écrit dans son carnet, et en informe ses parents lors de la cérémonie.</p>
+          <div class="materiel-block">
+            <strong>Option</strong>
+            Préparer un petit carton "Défi 21 jours" à remplir et à coller dans le carnet ou à remettre aux parents
+          </div>
+        </div>
+      </div>
+
+      <div class="activity" id="c3">
+        <div class="activity-header" onclick="toggle('c3')">
+          <span class="tag tag-atelier">Atelier</span>
+          <span class="activity-title">
+            Finalisation des gestes de bénédiction — Dernier temps créatif
+            <span class="subtitle">Lettres, objets, engagements — tout se finalise</span>
+          </span>
+          <span class="activity-duration">35 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : que chaque ado arrive à la cérémonie avec quelque chose de fini, de beau et d'authentique.</div>
+          <p>Temps libre pour finaliser leur geste de bénédiction commencé la veille. L'animateur circule pour aider à formuler, à clarifier, à encourager. Pour ceux qui peinent à écrire, proposez des structures d'amorce :</p>
+          <ul class="question-list">
+            <li>Ce que je veux vous dire et que je ne dis jamais, c'est...</li>
+            <li>Ce que j'admire le plus dans notre famille, c'est...</li>
+            <li>Ma promesse pour les prochains mois, c'est...</li>
+          </ul>
+          <div class="tip-block">Certains ados seront touchants, d'autres brefs. Les deux sont vrais. Ne valorisez pas la longueur, valorisez l'honnêteté.</div>
+        </div>
+      </div>
+
+      <div class="activity" id="c4">
+        <div class="activity-header" onclick="toggle('c4')">
+          <span class="tag tag-discussion">Discussion</span>
+          <span class="activity-title">
+            Le bilan des 3 jours — Ce qui reste, ce qui change
+            <span class="subtitle">Discussion de clôture entre ados</span>
+          </span>
+          <span class="activity-duration">20 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : ancrer les prises de conscience avant de retrouver les parents — ne pas "atterrir" trop vite.</div>
+          <p>En cercle, sans carnet. Tour de table rapide avec trois questions :</p>
+          <ul class="question-list">
+            <li>Une chose que je pensais et que j'ai remis en question ces 3 jours</li>
+            <li>Une chose que je vais faire différemment en rentrant</li>
+            <li>Un mot pour décrire comment je me sens maintenant</li>
+          </ul>
+          <p>Pas de résumé magistral de l'animateur. Juste la présence et l'écoute. Si des silences s'installent, laissez-les.</p>
+        </div>
+      </div>
+
+      <div class="activity" id="c5">
+        <div class="activity-header" onclick="toggle('c5')">
+          <span class="tag tag-louange">Louange</span>
+          <span class="activity-title">
+            Le set de clôture — Louange avant la cérémonie
+            <span class="subtitle">Préparation du cœur pour le grand moment</span>
+          </span>
+          <span class="activity-duration">20 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : créer un espace intérieur de paix avant la cérémonie — sortir de la tête, entrer dans le cœur.</div>
+          <p>Moment de louange calme, mené par les ados volontaires comme au jour 2. Terminé par 2 minutes de silence total. L'animateur dit simplement : <em>"Dieu te regarde. Tu es son enfant. Maintenant, va bénir ta famille."</em></p>
+        </div>
+      </div>
+
+      <!-- CEREMONIE -->
+      <div class="activity" id="c6" style="border: 2px solid var(--gold);">
+        <div class="activity-header" onclick="toggle('c6')" style="background: var(--gold-pale);">
+          <span class="tag tag-ceremonie">Cérémonie</span>
+          <span class="activity-title" style="font-size:1rem;">
+            Grand rassemblement — Les ados rejoignent leurs parents
+            <span class="subtitle">Moment de clôture de la retraite familiale</span>
+          </span>
+          <span class="activity-duration" style="color:var(--gold-dim);">45 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj" style="background:var(--gold-pale); border-color:var(--gold); color:var(--gold-dim);">MOMENT FORT · Les familles se retrouvent pour la conclusion de la retraite.</div>
+          <h4>Déroulement</h4>
+          <ol class="step-list">
+            <li><strong>Entrée en silence</strong> des ados, qui s'installent face à leurs parents. Pas de procession festive — gravité et solennité choisie.</li>
+            <li><strong>Présentation du mur des noms</strong> par un animateur : <em>"Pendant ces 3 jours, vos enfants ont prié pour vous. Par leur prénom. Tous les jours."</em></li>
+            <li><strong>Remise des gestes de bénédiction</strong> : chaque ado va vers ses parents, les regarde, remet ce qu'il a préparé, et dit sa promesse des 21 jours. Moment libre, sans script imposé.</li>
+            <li><strong>Bénédiction parentale</strong> guidée par le responsable de la retraite : les parents posent les mains sur les épaules de leur enfant et prononcent une bénédiction — un mot, une phrase, une prière. Guidé mais non dicté.</li>
+            <li><strong>Temps libre familial</strong> : 10 minutes où parents et enfants peuvent parler, s'embrasser, pleurer, rire — sans animation.</li>
+            <li><strong>Prière de clôture collective</strong> par le pasteur ou le responsable.</li>
+          </ol>
+          <div class="verse-block">"Je te bénirai... et tu seras une bénédiction." (Genèse 12:2)</div>
+          <div class="warning-block">Pour les ados dont la relation familiale est tendue ou complexe, préparez en amont une option : remettre le geste de bénédiction à un animateur de confiance qui le transmettra, ou adresser le texte à un autre adulte bienveillant de leur vie (grand-parent, oncle, pasteur).</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function toggle(id) {
+    document.getElementById(id).classList.toggle('open');
+  }
+  function switchTo(panel) {
+    document.querySelectorAll('.day-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('panel-' + panel).classList.add('active');
+    document.querySelector('[data-panel="' + panel + '"]').classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  document.querySelectorAll('.nav-tab').forEach(t => {
+    t.addEventListener('click', () => switchTo(t.dataset.panel));
+  });
+</script>
+
+</body>
+</html>
